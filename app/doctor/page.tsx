@@ -1,14 +1,56 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import DashboardLayout from "@/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { LayoutDashboard, Users, ClipboardList, Pill, History, FileText, UserCircle, Clock } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
+import PrescriptionForm from "@/components/prescription-form"
+import { HospitalStorage } from "@/lib/storage"
+import {
+  LayoutDashboard,
+  Users,
+  ClipboardList,
+  Pill,
+  History,
+  FileText,
+  UserCircle,
+  Clock,
+  Plus,
+  Search,
+  Edit,
+  Eye,
+} from "lucide-react"
+
+interface Appointment {
+  id: string
+  patientId: string
+  patientName: string
+  doctorId: string
+  doctorName: string
+  poli: string
+  date: string
+  time: string
+  complaint: string
+  status: string
+  queueNumber: number
+}
 
 export default function DoctorDashboard() {
   const [activeView, setActiveView] = useState("dashboard")
+  const [appointments, setAppointments] = useState<any[]>([])
+  const [prescriptions, setPrescriptions] = useState<any[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [medicalRecords, setMedicalRecords] = useState<any[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedItem, setSelectedItem] = useState<any>(null)
+  const [showForm, setShowForm] = useState(false)
+
+  const storage = HospitalStorage.getInstance()
 
   const sidebarItems = [
     {
@@ -44,83 +86,69 @@ export default function DoctorDashboard() {
     },
   ]
 
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const loadData = () => {
+    const userSession = localStorage.getItem("userSession")
+    if (userSession) {
+      const session = JSON.parse(userSession)
+      const users = storage.getAll("users")
+      const currentDoctor: any = users.find((u: any) => u.username === session.username)
+
+      if (currentDoctor) {
+        // Filter appointments for current doctor
+        const allAppointments = storage.getAll("appointments")
+        const doctorAppointments = allAppointments.filter((apt: any) => apt.doctorName === currentDoctor.name)
+        setAppointments(doctorAppointments)
+
+        // Filter prescriptions for current doctor
+        const allPrescriptions = storage.getAll("prescriptions")
+        const doctorPrescriptions = allPrescriptions.filter((presc: any) => presc.doctorId === currentDoctor.id)
+        setPrescriptions(doctorPrescriptions)
+
+        // Filter medical records for current doctor
+        const allRecords = storage.getAll("medicalRecords")
+        const doctorRecords = allRecords.filter((record: any) => record.doctorId === currentDoctor.id)
+        setMedicalRecords(doctorRecords)
+      }
+    }
+  }
+
+  const handleSave = () => {
+    setShowForm(false)
+    setSelectedItem(null)
+    loadData()
+  }
+
+  const updateAppointmentStatus = (id: string, status: string) => {
+    storage.update<Appointment>("appointments", id, { status })
+    loadData()
+  }
+
+  const todayDate = new Date().toISOString().split("T")[0]
+  const todayAppointments = appointments.filter((apt) => apt.date === todayDate)
+
   const todaySchedule = {
     doctor: "dr. Budi Santoso",
     poli: "Poli Umum",
     schedule: "Senin - Jumat, 08:00 - 15:00",
-    totalPatients: 12,
-    completed: 8,
-    remaining: 4,
+    totalPatients: todayAppointments.length,
+    completed: todayAppointments.filter((apt) => apt.status === "completed").length,
+    remaining: todayAppointments.filter((apt) => apt.status !== "completed" && apt.status !== "cancelled").length,
   }
 
-  const todayPatients = [
-    {
-      id: "001234",
-      name: "Budi Santoso",
-      age: 45,
-      time: "08:30",
-      complaint: "Demam dan batuk",
-      status: "completed",
-      queue: 1,
-    },
-    {
-      id: "001235",
-      name: "Siti Aminah",
-      age: 32,
-      time: "09:00",
-      complaint: "Sakit kepala",
-      status: "completed",
-      queue: 2,
-    },
-    {
-      id: "001236",
-      name: "Ahmad Fauzi",
-      age: 28,
-      time: "09:30",
-      complaint: "Nyeri perut",
-      status: "in-progress",
-      queue: 3,
-    },
-    {
-      id: "001237",
-      name: "Dewi Sari",
-      age: 35,
-      time: "10:00",
-      complaint: "Kontrol diabetes",
-      status: "waiting",
-      queue: 4,
-    },
-    {
-      id: "001238",
-      name: "Rudi Hartono",
-      age: 50,
-      time: "10:30",
-      complaint: "Hipertensi",
-      status: "waiting",
-      queue: 5,
-    },
-  ]
+  const filteredAppointments = todayAppointments.filter(
+    (appointment) =>
+      appointment.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.complaint.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
-  const recentPrescriptions = [
-    {
-      patientName: "Budi Santoso",
-      medicines: ["Paracetamol 500mg", "OBH Combi"],
-      date: "2024-01-15",
-      status: "dispensed",
-    },
-    {
-      patientName: "Siti Aminah",
-      medicines: ["Ibuprofen 400mg", "Vitamin B Complex"],
-      date: "2024-01-15",
-      status: "pending",
-    },
-    {
-      patientName: "Ahmad Fauzi",
-      medicines: ["Antasida", "Domperidone"],
-      date: "2024-01-15",
-      status: "pending",
-    },
-  ]
+  const filteredPrescriptions = prescriptions.filter(
+    (prescription) =>
+      prescription.patientName.toLowerCase().includes(searchTerm.toLowerCase()) || prescription.id.includes(searchTerm),
+  )
 
   const renderDashboard = () => (
     <div className="space-y-6">
@@ -198,13 +226,13 @@ export default function DoctorDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {todayPatients.slice(0, 5).map((patient, index) => (
+              {todayAppointments.slice(0, 5).map((patient, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <Badge variant="outline">#{patient.queue}</Badge>
+                      <Badge variant="outline">#{patient.queueNumber}</Badge>
                       <div>
-                        <p className="font-medium">{patient.name}</p>
+                        <p className="font-medium">{patient.patientName}</p>
                         <p className="text-sm text-gray-600">{patient.complaint}</p>
                       </div>
                     </div>
@@ -237,11 +265,11 @@ export default function DoctorDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Resep Terbaru</CardTitle>
-            <CardDescription>Resep yang baru dibuat hari ini</CardDescription>
+            <CardDescription>Resep yang baru dibuat</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentPrescriptions.map((prescription, index) => (
+              {prescriptions.slice(0, 5).map((prescription, index) => (
                 <div key={index} className="p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <p className="font-medium">{prescription.patientName}</p>
@@ -250,7 +278,7 @@ export default function DoctorDashboard() {
                     </Badge>
                   </div>
                   <div className="text-sm text-gray-600">
-                    <p>Obat: {prescription.medicines.join(", ")}</p>
+                    <p>Obat: {prescription.medicines.map((m: any) => m.medicineName).join(", ")}</p>
                     <p>Tanggal: {prescription.date}</p>
                   </div>
                 </div>
@@ -259,59 +287,229 @@ export default function DoctorDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Aksi Cepat</CardTitle>
+          <CardDescription>Akses cepat ke fitur utama</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Button onClick={() => setActiveView("patients")} className="h-20 flex-col gap-2">
+              <Users className="w-6 h-6" />
+              Pasien Hari Ini
+            </Button>
+            <Button onClick={() => setActiveView("prescriptions")} className="h-20 flex-col gap-2" variant="outline">
+              <Pill className="w-6 h-6" />
+              Buat Resep
+            </Button>
+            <Button onClick={() => setActiveView("history")} className="h-20 flex-col gap-2" variant="outline">
+              <History className="w-6 h-6" />
+              Riwayat Pasien
+            </Button>
+            <Button onClick={() => setActiveView("notes")} className="h-20 flex-col gap-2" variant="outline">
+              <FileText className="w-6 h-6" />
+              Catatan Medis
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 
   const renderPatients = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle>Pasien Hari Ini</CardTitle>
-        <CardDescription>Kelola pemeriksaan pasien</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {todayPatients.map((patient, index) => (
-            <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-4">
-                <Badge variant="outline" className="text-lg px-3 py-1">
-                  #{patient.queue}
-                </Badge>
-                <div>
-                  <p className="font-semibold">{patient.name}</p>
-                  <p className="text-sm text-gray-600">
-                    RM: {patient.id} | Umur: {patient.age} tahun
-                  </p>
-                  <p className="text-sm text-gray-600">Keluhan: {patient.complaint}</p>
-                  <p className="text-sm text-gray-600">Jadwal: {patient.time}</p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Pasien Hari Ini</h2>
+          <p className="text-gray-600">Kelola pemeriksaan pasien</p>
+        </div>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Cari pasien..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Badge variant="outline">{filteredAppointments.length} pasien</Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {filteredAppointments.map((patient, index) => (
+              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-4">
+                  <Badge variant="outline" className="text-lg px-3 py-1">
+                    #{patient.queueNumber}
+                  </Badge>
+                  <div>
+                    <p className="font-semibold">{patient.patientName}</p>
+                    <p className="text-sm text-gray-600">
+                      ID: {patient.patientId} | Jadwal: {patient.time}
+                    </p>
+                    <p className="text-sm text-gray-600">Keluhan: {patient.complaint}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge
+                    variant={
+                      patient.status === "completed"
+                        ? "default"
+                        : patient.status === "in-progress"
+                          ? "secondary"
+                          : "outline"
+                    }
+                  >
+                    {patient.status === "completed"
+                      ? "Selesai"
+                      : patient.status === "in-progress"
+                        ? "Sedang Diperiksa"
+                        : "Menunggu"}
+                  </Badge>
+                  {patient.status !== "completed" && (
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => updateAppointmentStatus(patient.id, "in-progress")}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        {patient.status === "in-progress" ? "Lanjut Periksa" : "Mulai Periksa"}
+                      </Button>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button size="sm" variant="outline">
+                            <Pill className="w-4 h-4 mr-2" />
+                            Resep
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                          <DialogTitle>Buat Resep Obat</DialogTitle>
+                          <PrescriptionForm
+                            appointmentId={patient.id}
+                            patientId={patient.patientId}
+                            onSave={() => {
+                              updateAppointmentStatus(patient.id, "completed")
+                              loadData()
+                            }}
+                            onCancel={() => {}}
+                          />
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Badge
-                  variant={
-                    patient.status === "completed"
-                      ? "default"
-                      : patient.status === "in-progress"
-                        ? "secondary"
-                        : "outline"
-                  }
-                >
-                  {patient.status === "completed"
-                    ? "Selesai"
-                    : patient.status === "in-progress"
-                      ? "Sedang Diperiksa"
-                      : "Menunggu"}
-                </Badge>
-                {patient.status !== "completed" && (
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                    {patient.status === "in-progress" ? "Lanjut Periksa" : "Mulai Periksa"}
-                  </Button>
-                )}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+
+  const renderPrescriptions = () => (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Resep Obat</h2>
+          <p className="text-gray-600">Kelola resep obat untuk pasien</p>
         </div>
-      </CardContent>
-    </Card>
+        <Dialog open={showForm} onOpenChange={setShowForm}>
+          <DialogTrigger asChild>
+            <Button onClick={() => setSelectedItem(null)} className="bg-[#2E8B57] hover:bg-[#2E8B57]/90">
+              <Plus className="w-4 h-4 mr-2" />
+              Buat Resep Baru
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogTitle>Buat Resep Baru</DialogTitle>
+            <PrescriptionForm prescription={selectedItem} onSave={handleSave} onCancel={() => setShowForm(false)} />
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Cari resep..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Badge variant="outline">{filteredPrescriptions.length} resep</Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID Resep</TableHead>
+                <TableHead>Nama Pasien</TableHead>
+                <TableHead>Tanggal</TableHead>
+                <TableHead>Jumlah Obat</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredPrescriptions.map((prescription) => (
+                <TableRow key={prescription.id}>
+                  <TableCell className="font-medium">{prescription.id}</TableCell>
+                  <TableCell>{prescription.patientName}</TableCell>
+                  <TableCell>{prescription.date}</TableCell>
+                  <TableCell>{prescription.medicines.length} obat</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        prescription.status === "dispensed"
+                          ? "default"
+                          : prescription.status === "cancelled"
+                            ? "destructive"
+                            : "secondary"
+                      }
+                    >
+                      {prescription.status === "dispensed"
+                        ? "Sudah Diserahkan"
+                        : prescription.status === "cancelled"
+                          ? "Dibatalkan"
+                          : "Menunggu"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedItem(prescription)
+                          setShowForm(true)
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
   )
 
   const renderContent = () => {
@@ -320,6 +518,8 @@ export default function DoctorDashboard() {
         return renderDashboard()
       case "patients":
         return renderPatients()
+      case "prescriptions":
+        return renderPrescriptions()
       case "history":
         return (
           <Card>
@@ -328,19 +528,7 @@ export default function DoctorDashboard() {
               <CardDescription>Riwayat pemeriksaan pasien sebelumnya</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">Fitur riwayat pemeriksaan akan dikembangkan di sini...</p>
-            </CardContent>
-          </Card>
-        )
-      case "prescriptions":
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Resep Obat</CardTitle>
-              <CardDescription>Kelola resep obat untuk pasien</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Fitur resep obat akan dikembangkan di sini...</p>
+              <p className="text-gray-600">Fitur riwayat pemeriksaan akan dikembangkan lebih lanjut...</p>
             </CardContent>
           </Card>
         )
@@ -352,7 +540,7 @@ export default function DoctorDashboard() {
               <CardDescription>Catatan khusus untuk pasien</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">Fitur catatan medis akan dikembangkan di sini...</p>
+              <p className="text-gray-600">Fitur catatan medis akan dikembangkan lebih lanjut...</p>
             </CardContent>
           </Card>
         )
@@ -364,7 +552,7 @@ export default function DoctorDashboard() {
               <CardDescription>Edit data pribadi dan jadwal praktek</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">Fitur profil akan dikembangkan di sini...</p>
+              <p className="text-gray-600">Fitur profil akan dikembangkan lebih lanjut...</p>
             </CardContent>
           </Card>
         )

@@ -249,6 +249,206 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Team Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-4 text-[#2E8B57]">Tim Pengembang Sistem</h2>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Tim profesional yang mengembangkan sistem manajemen puskesmas untuk meningkatkan pelayanan kesehatan
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Project Manager */}
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-20 h-20 bg-[#2E8B57] rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                ZA
+              </div>
+              <h3 className="text-xl font-bold mb-2">Zahira Alisya Kunaifi</h3>
+              <p className="text-[#2E8B57] font-semibold mb-3">Project Manager</p>
+              <p className="text-gray-600 text-sm mb-4">
+                Mengatur jadwal dan memastikan proyek berjalan lancar sesuai timeline
+              </p>
+
+              <div className="text-left space-y-3">
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">TANGGUNG JAWAB:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Membuat jadwal kerja tim</li>
+                    <li>• Mengecek progress harian</li>
+                    <li>• Koordinasi antar divisi</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">WEWENANG:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Menentukan prioritas tugas</li>
+                    <li>• Mengatur pembagian kerja</li>
+                    <li>• Evaluasi kinerja tim</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* UI/UX Designer */}
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-20 h-20 bg-[#2E8B57] rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                TN
+              </div>
+              <h3 className="text-xl font-bold mb-2">Tiara Nur Fitriansyah</h3>
+              <p className="text-[#2E8B57] font-semibold mb-3">UI/UX Designer</p>
+              <p className="text-gray-600 text-sm mb-4">Membuat tampilan website yang bagus dan mudah digunakan</p>
+
+              <div className="text-left space-y-3">
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">TANGGUNG JAWAB:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Mendesain tampilan halaman</li>
+                    <li>• Memilih warna dan font</li>
+                    <li>• Membuat wireframe</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">WEWENANG:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Menentukan desain tampilan</li>
+                    <li>• Memilih tema warna</li>
+                    <li>• Revisi desain interface</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* Backend Developer */}
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-20 h-20 bg-[#2E8B57] rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                NA
+              </div>
+              <h3 className="text-xl font-bold mb-2">Nabil Abiyyu Zhafran</h3>
+              <p className="text-[#2E8B57] font-semibold mb-3">Backend Developer</p>
+              <p className="text-gray-600 text-sm mb-4">
+                Membuat sistem di belakang layar agar website berfungsi dengan baik
+              </p>
+
+              <div className="text-left space-y-3">
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">TANGGUNG JAWAB:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Membuat database</li>
+                    <li>• Mengatur penyimpanan data</li>
+                    <li>• Integrasi sistem</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">WEWENANG:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Menentukan struktur database</li>
+                    <li>• Mengatur keamanan data</li>
+                    <li>• Optimasi performa sistem</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* Frontend Developer */}
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-20 h-20 bg-[#2E8B57] rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                RA
+              </div>
+              <h3 className="text-xl font-bold mb-2">Radhi Aulia Rahman</h3>
+              <p className="text-[#2E8B57] font-semibold mb-3">Frontend Developer</p>
+              <p className="text-gray-600 text-sm mb-4">
+                Membuat tampilan website yang bisa diklik dan digunakan pengguna
+              </p>
+
+              <div className="text-left space-y-3">
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">TANGGUNG JAWAB:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Coding tampilan website</li>
+                    <li>• Membuat tombol dan form</li>
+                    <li>• Responsive design</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">WEWENANG:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Menentukan cara coding</li>
+                    <li>• Memilih framework</li>
+                    <li>• Optimasi tampilan</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* Content Writer */}
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-20 h-20 bg-[#2E8B57] rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                AN
+              </div>
+              <h3 className="text-xl font-bold mb-2">Audrey Ndjukatana Hamaratu Tidah</h3>
+              <p className="text-[#2E8B57] font-semibold mb-3">Content Writer & Dokumentasi</p>
+              <p className="text-gray-600 text-sm mb-4">Menulis isi website dan membuat panduan penggunaan sistem</p>
+
+              <div className="text-left space-y-3">
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">TANGGUNG JAWAB:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Menulis teks di website</li>
+                    <li>• Membuat panduan user</li>
+                    <li>• Dokumentasi sistem</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">WEWENANG:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Menentukan isi konten</li>
+                    <li>• Menyetujui teks website</li>
+                    <li>• Revisi dokumentasi</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* Quality Tester */}
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-20 h-20 bg-[#2E8B57] rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                MR
+              </div>
+              <h3 className="text-xl font-bold mb-2">Muhammad Rizky Ikhsan Saputro</h3>
+              <p className="text-[#2E8B57] font-semibold mb-3">Quality Tester</p>
+              <p className="text-gray-600 text-sm mb-4">
+                Mengecek website agar tidak ada error dan berfungsi dengan baik
+              </p>
+
+              <div className="text-left space-y-3">
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">TANGGUNG JAWAB:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Testing semua fitur</li>
+                    <li>• Mencari bug dan error</li>
+                    <li>• Validasi fungsionalitas</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">WEWENANG:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Menentukan standar testing</li>
+                    <li>• Menyetujui hasil test</li>
+                    <li>• Reject fitur bermasalah</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Info */}
       <section className="py-12 bg-[#2E8B57] text-white">
         <div className="container mx-auto px-4">
