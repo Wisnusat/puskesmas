@@ -15,7 +15,7 @@ interface DashboardLayoutProps {
   title: string
   role: string
   sidebarItems: Array<{
-    icon: React.ComponentType
+    icon: React.ComponentType<any>
     label: string
     href?: string
     onClick?: () => void
@@ -138,7 +138,7 @@ export default function DashboardLayout({ children, title, role, sidebarItems }:
                     className={`w-full justify-start ${item.active ? getRoleColor(role) : ""}`}
                     onClick={item.onClick}
                   >
-                    <IconComponent />
+                    <IconComponent className="w-4 h-4 mr-3" />
                     {item.label}
                   </Button>
                 )
